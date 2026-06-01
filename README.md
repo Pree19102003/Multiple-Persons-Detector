@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Multiple Person Detection
 
 ## Overview
@@ -172,3 +173,6 @@ Preethi G N
 
 MCA Student
 Surana College, Bangalore
+=======
+# Multiple-Person-Detection
+>>>>>>> 592cf0f33165a5fc6ec05ae1e0667793541dadb7
