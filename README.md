@@ -1,22 +1,23 @@
-<<<<<<< HEAD
 # Multiple Person Detection
 
 ## Overview
 
 This project detects multiple persons in front of a webcam using MediaPipe Face Detection and OpenCV.
 
-The system is designed for online proctoring and monitoring applications where only one person is allowed in the camera frame.
+The system is designed for online proctoring and monitoring applications where only one person is allowed in the camera frame. If more than one person is detected for a specified number of consecutive frames, a violation is triggered.
 
 ---
 
 ## Features
 
-* Real-time face detection
+* Real-time face detection using MediaPipe
 * Counts the number of persons in the frame
 * Detects multiple persons
 * Triggers violation after consecutive detections
 * REST API using Flask
 * Live webcam testing utility
+* Configurable detection parameters
+* Image-based unit testing with PyTest
 
 ---
 
@@ -25,12 +26,16 @@ The system is designed for online proctoring and monitoring applications where o
 ```text
 multiple_person_detection/
 │
-├── app.py                 # Flask API
-├── detector.py            # Detection logic
-├── config.py              # Configuration settings
-├── test_detector.py       # Webcam testing script
-├── requirements.txt       # Dependencies
-└── output/                # Output folder
+├── app.py                     # Flask API
+├── detector.py                # Detection logic
+├── config.py                  # Configuration settings
+├── test_detector.py           # Webcam testing script
+├── test_image_detection.py    # Image-based unit tests
+├── tests/
+│   ├── image1.png             # Single-person test image
+│   └── image2.png             # Multiple-person test image
+├── requirements.txt           # Dependencies
+└── output/                    # Output folder
 ```
 
 ---
@@ -46,20 +51,21 @@ multiple_person_detection/
 pip install -r requirements.txt
 ```
 
-Dependencies:
+### Dependencies
 
 ```text
 Flask
 OpenCV
 MediaPipe
 NumPy
+PyTest
 ```
 
 ---
 
 ## Configuration
 
-Edit `config.py`:
+Edit `config.py` to customize the detector settings:
 
 ```python
 MAX_ALLOWED_PERSONS = 1
@@ -69,15 +75,27 @@ MIN_FACE_AREA = 0.02
 CAMERA_INDEX = 0
 ```
 
+### Parameter Description
+
+| Parameter                | Description                                  |
+| ------------------------ | -------------------------------------------- |
+| MAX_ALLOWED_PERSONS      | Maximum allowed persons in frame             |
+| VIOLATION_AFTER_FRAMES   | Consecutive frames required before violation |
+| MIN_DETECTION_CONFIDENCE | Minimum confidence for face detection        |
+| MIN_FACE_AREA            | Filters tiny/background faces                |
+| CAMERA_INDEX             | Webcam index                                 |
+
 ---
 
 ## Run Webcam Detection
+
+Start real-time detection using your webcam:
 
 ```bash
 python test_detector.py
 ```
 
-Output:
+### Example Output
 
 ```json
 {
@@ -90,11 +108,13 @@ Output:
 
 ## Run Flask API
 
+Start the API server:
+
 ```bash
 python app.py
 ```
 
-Server:
+Server URL:
 
 ```text
 http://127.0.0.1:5000
@@ -102,11 +122,11 @@ http://127.0.0.1:5000
 
 ### API Endpoint
 
-```text
+```http
 GET /detect
 ```
 
-Example Response:
+### Example Response
 
 ```json
 {
@@ -117,19 +137,75 @@ Example Response:
 
 ---
 
+## Run Unit Tests
+
+This project includes image-based unit tests to verify the detection logic without requiring a webcam.
+
+```bash
+pytest test_image_detection.py
+```
+
+### Expected Output
+
+```text
+========================
+2 passed
+========================
+```
+
+### Test Cases
+
+#### Single Person Test
+
+Input:
+
+```text
+tests/image1.png
+```
+
+Expected:
+
+```json
+{
+  "person_count": 1,
+  "violation": false
+}
+```
+
+#### Multiple Persons Test
+
+Input:
+
+```text
+tests/image2.png
+```
+
+Expected:
+
+```json
+{
+  "person_count": 2,
+  "violation": true
+}
+```
+
+---
+
 ## Detection Logic
 
 1. Capture webcam frame.
-2. Convert frame to RGB.
-3. Detect faces using MediaPipe.
-4. Filter tiny faces using area threshold.
-5. Count valid faces.
-6. If count > 1:
+2. Convert frame from BGR to RGB.
+3. Detect faces using MediaPipe Face Detection.
+4. Calculate face area.
+5. Ignore tiny/background faces using `MIN_FACE_AREA`.
+6. Count valid faces.
+7. If person count exceeds the allowed limit:
 
-   * Increase violation counter.
-7. If counter reaches threshold:
+   * Increment violation counter.
+8. If violation counter reaches threshold:
 
    * Trigger violation.
+9. Return detection results.
 
 ---
 
@@ -164,15 +240,24 @@ Example Response:
 * Screenshot capture on violation
 * Violation logging database
 * Audio monitoring
+* Face recognition for candidate verification
+
+---
+
+## Technologies Used
+
+* Python
+* OpenCV
+* MediaPipe
+* Flask
+* NumPy
+* PyTest
 
 ---
 
 ## Author
 
-Preethi G N
+**Preethi G N**
 
 MCA Student
 Surana College, Bangalore
-=======
-# Multiple-Person-Detection
->>>>>>> 592cf0f33165a5fc6ec05ae1e0667793541dadb7
